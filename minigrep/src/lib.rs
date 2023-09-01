@@ -1,6 +1,9 @@
 use std::error::Error;
 use std::fs;
 use std::env;
+use std::collections::HashMap;
+
+
 pub struct Config {
    pub query: String,
    pub file_path: String,
@@ -33,9 +36,10 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         search(&config.query, &contents)
     };
 
-    for line in results {
-        println!("{line}");
+    for (number, line) in results.iter() {
+        println!("found \"{line}\" on line: {number}");
     }
+    println!("\n");
 
     Ok(())
 }
@@ -54,7 +58,10 @@ Rust:
 safe, fast, productive.
 Pick three,";
 
-        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+        let lines: Vec<&str> = search(query, contents).into_values().collect();
+        let num: Vec<i32> = search(query, contents).into_keys().collect();
+        assert_eq!(vec!["safe, fast, productive."], lines );
+        assert_eq!(vec![2], num);
     }
     #[test]
     fn case_insensitive() {
@@ -63,33 +70,39 @@ Pick three,";
 Rust:
 safe, fast, productive.
 Pick three,";
-
-        assert_eq!(vec!["safe, fast, productive."], search_case_insensitive(query, contents));
+        
+        let lines: Vec<&str> = search_case_insensitive(query, contents).into_values().collect();
+        let num: Vec<i32> = search_case_insensitive(query, contents).into_keys().collect();
+        assert_eq!(vec!["safe, fast, productive."], lines );
+        assert_eq!(vec![2], num);                            
     }
 }
 
 pub fn search_case_insensitive<'a>
-(query: &str, contents: &'a str) -> Vec<&'a str> {
-
-    let mut results = Vec::new();
+(query: &str, contents: &'a str) -> HashMap<i32, &'a str>  {
+    let mut count = 0;
+    let mut results = HashMap::new();
     let query = query.to_lowercase();
 
     for line in contents.lines() {
+        count += 1;
         if line.to_lowercase().contains(&query) {
-            results.push(line);
+            results.insert(count, line);
         }
     }
     results
+    
 }
 
         
 
-pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let mut results = Vec::new();
-
+pub fn search<'a>(query: &str, contents: &'a str) -> HashMap<i32, &'a str> {
+    let mut results = HashMap::new();
+    let mut count = 0;
     for line in contents.lines() {
+        count += 1;
         if line.contains(query) {
-            results.push(line);
+            results.insert(count, line);
         }
     }
 
