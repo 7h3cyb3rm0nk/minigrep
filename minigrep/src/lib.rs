@@ -19,15 +19,15 @@ impl Config {
         args.next();
 
         let query = match args.next() {
-            some(arg) => arg,
+            Some(arg) => arg,
             None => return Err("Didn't get a query string"),
         };
 
         let file_path = match args.next() {
-            some(arg) => arg,
+            Some(arg) => arg,
             None => return Err("Didn't get a file path"),
         };
-        let ignore_case = env::var("IGNORE_CASE")is_ok();
+        let ignore_case = env::var("IGNORE_CASE").is_ok();
 
 
 
@@ -114,12 +114,26 @@ pub fn search_case_insensitive<'a>
 pub fn search<'a>(query: &str, contents: &'a str) -> HashMap<i32, &'a str> {
     let mut results = HashMap::new();
     let mut count = 0;
-    for line in contents.lines() {
-        count += 1;
-        if line.contains(query) {
-            results.insert(count, line);
-        }
-    }
+    let _ = contents
+        .lines()
+        .map(|x|
+             {
+        
+            if x.contains(query)
+            {
+                results.insert(count,x);
+                count += 1;
+            }
+            else {
+                count +=1;
+            }
+
+             }
+            );
+   
+ 
+
+
 
     results
 
