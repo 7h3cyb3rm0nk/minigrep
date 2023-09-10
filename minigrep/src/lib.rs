@@ -114,12 +114,7 @@ pub fn search_case_insensitive<'a>
 pub fn search<'a>(query: &str, contents: &'a str) -> HashMap<i32, &'a str> {
     let mut results = HashMap::new();
     let mut count = 0;
-    for line in contents.lines() {
-        count += 1;
-        if line.contains(query) {
-            results.insert(count, line);
-        }
-    }
+    results.insert(contents.lines().filter(|x| x.contains(query).enumerate()));
 
     results
 
